@@ -20,13 +20,13 @@
 
 #include "builder.h"
 
-class QLocalServer;
+#include <QLocalServer>
 
 class QFCgiLocalConnectionBuilder : public QFCgiConnectionBuilder {
   Q_OBJECT
 
 public:
-  QFCgiLocalConnectionBuilder(const QString &path, QObject *parent = 0);
+  QFCgiLocalConnectionBuilder(const QString &path, QLocalServer::SocketOptions opts = QLocalServer::NoOptions, QObject *parent = 0);
   virtual ~QFCgiLocalConnectionBuilder();
 
   bool listen();

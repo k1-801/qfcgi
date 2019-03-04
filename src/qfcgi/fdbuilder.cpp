@@ -26,43 +26,48 @@
 #include "fcgi.h"
 #include "fdbuilder.h"
 
-QFCgiFdConnectionBuilder::QFCgiFdConnectionBuilder(int fd, QObject *parent)
-  : QFCgiConnectionBuilder(parent) {
-
-  this->fd = fd;
-  this->notifier = 0;
+QFCgiFdConnectionBuilder::QFCgiFdConnectionBuilder(int fd, QObject *parent) : QFCgiConnectionBuilder(parent)
+{
+	this->fd = fd;
+	this->notifier = nullptr;
 }
 
-QFCgiFdConnectionBuilder::~QFCgiFdConnectionBuilder() {
+QFCgiFdConnectionBuilder::~QFCgiFdConnectionBuilder() {}
+
+bool QFCgiFdConnectionBuilder::listen()
+{
+	this->notifier = new QSocketNotifier(fd, QSocketNotifier::Read, this);
+	connect(this->notifier, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
+	qDebug("FastCGI application started, listening on %d", static_cast<int>(this->notifier->socket()));
+	return true;
 }
 
-bool QFCgiFdConnectionBuilder::listen() {
-  this->notifier = new QSocketNotifier(fd, QSocketNotifier::Read, this);
-  connect(this->notifier, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
-  qDebug("FastCGI application started, listening on %d", this->notifier->socket());
-  return true;
+bool QFCgiFdConnectionBuilder::isListening() const
+{
+	return (this->notifier != nullptr);
 }
 
-bool QFCgiFdConnectionBuilder::isListening() const {
-  return (this->notifier != 0);
+QString QFCgiFdConnectionBuilder::errorString() const
+{
+	return "";
 }
 
-QString QFCgiFdConnectionBuilder::errorString() const {
-  return "";
-}
+void QFCgiFdConnectionBuilder::onActivated(int socket)
+{
+	int so = accept(socket, nullptr, nullptr);
 
-void QFCgiFdConnectionBuilder::onActivated(int socket) {
-  int so = accept(socket, 0, 0);
+	if (so != -1)
+	{
+		QFCgi *fcgi = qobject_cast<QFCgi*>(parent());
 
-  if (so != -1) {
-    QFCgi *fcgi = qobject_cast<QFCgi*>(parent());
+		QLocalSocket *device = new QLocalSocket(this);
+		device->setSocketDescriptor(so, QLocalSocket::ConnectedState, QIODevice::ReadWrite);
 
-    QLocalSocket *device = new QLocalSocket(this);
-    device->setSocketDescriptor(so, QLocalSocket::ConnectedState, QIODevice::ReadWrite);
-
-    QFCgiConnection *connection = new QFCgiConnection(device, fcgi);
-    emit newConnection(connection);
-  } else {
-    qDebug("accept: %s", strerror(errno));
-  }
+		QFCgiConnection *connection = new QFCgiConnection(device, fcgi);
+		emit newConnection(connection);
+	}
+	else
+	{
+		qDebug("accept: %s", strerror(errno));
+	}
 }

@@ -24,52 +24,67 @@
 #include "localbuilder.h"
 #include "tcpbuilder.h"
 
-QFCgi::QFCgi(QObject *parent) : QObject(parent) {
-  this->builder = new QFCgiTcpConnectionBuilder(QHostAddress::Any, 9000, this);
+QFCgi::QFCgi(QObject *parent) : QObject(parent)
+{
+	this->builder = new QFCgiTcpConnectionBuilder(QHostAddress::Any, 9000, this);
 }
 
-QFCgi::~QFCgi() {
+QFCgi::~QFCgi() {}
 
+void QFCgi::configureListen(const QHostAddress &address, quint16 port)
+{
+	updateBuilder(new QFCgiTcpConnectionBuilder(address, port, this));
 }
 
-void QFCgi::configureListen(const QHostAddress &address, quint16 port) {
-  updateBuilder(new QFCgiTcpConnectionBuilder(address, port, this));
+void QFCgi::configureListen(const QString &path, QLocalServer::SocketOptions opts)
+{
+	updateBuilder(new QFCgiLocalConnectionBuilder(path, opts, this));
 }
 
-void QFCgi::configureListen(const QString &path) {
-  updateBuilder(new QFCgiLocalConnectionBuilder(path, this));
+void QFCgi::configureListen(enum FileDescriptor fd)
+{
+	updateBuilder(new QFCgiFdConnectionBuilder(fd, this));
 }
 
-void QFCgi::configureListen(enum FileDescriptor fd) {
-  updateBuilder(new QFCgiFdConnectionBuilder(fd, this));
+bool QFCgi::isStarted() const
+{
+	return (this->builder) && this->builder->isListening();
 }
 
-bool QFCgi::isStarted() const {
-  return (this->builder != 0) && this->builder->isListening();
+QString QFCgi::errorString() const
+{
+	if (this->builder)
+	{
+		return this->builder->errorString();
+	}
+	else
+	{
+		return "not started";
+	}
 }
 
-QString QFCgi::errorString() const {
-  if (this->builder != 0) {
-    return this->builder->errorString();
-  } else {
-    return "not started";
-  }
+void QFCgi::start()
+{
+	if (this->builder->listen())
+	{
+		connect(this->builder, SIGNAL(newConnection(QFCgiConnection*)), this, SLOT(onNewConnection(QFCgiConnection*)));
+	}
+	else
+	{
+		qDebug("failed to start FastCGI application: %s", qPrintable(this->builder->errorString()));
+	}
 }
 
-void QFCgi::start() {
-  if (this->builder->listen()) {
-    connect(this->builder, SIGNAL(newConnection(QFCgiConnection*)),
-            this, SLOT(onNewConnection(QFCgiConnection*)));
-  } else {
-    qDebug("failed to start FastCGI application: %s", qPrintable(this->builder->errorString()));
-  }
+void QFCgi::onNewConnection(QFCgiConnection *connection)
+{
+	qDebug("[%d] FastCGI connection accepted", connection->getId());
 }
 
-void QFCgi::onNewConnection(QFCgiConnection *connection) {
-  qDebug("[%d] FastCGI connection accepted", connection->getId());
-}
-
-void QFCgi::updateBuilder(QFCgiConnectionBuilder *builder) {
-  delete this->builder;
-  this->builder = builder;
+void QFCgi::updateBuilder(QFCgiConnectionBuilder *builder)
+{
+	if(this->builder)
+	{
+		delete this->builder;
+	}
+	this->builder = builder;
 }

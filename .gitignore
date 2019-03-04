@@ -1,2 +1,4 @@
 doc/
 build/
+*.stash
+*.user*

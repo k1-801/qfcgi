@@ -20,28 +20,29 @@
 
 #include <QIODevice>
 
-class QFCgiStream : public QIODevice {
-  Q_OBJECT
+class QFCgiStream : public QIODevice
+{
+	Q_OBJECT
 
-public:
-  QFCgiStream(QObject *parent = 0);
-  virtual ~QFCgiStream();
+	public:
+		QFCgiStream(QObject *parent = nullptr);
+		virtual ~QFCgiStream();
 
-  bool atEnd() const;
-  qint64 bytesAvailable() const;
-  bool isSequential() const;
+		bool atEnd() const;
+		qint64 bytesAvailable() const;
+		bool isSequential() const;
 
-  QByteArray& getBuffer();
-  bool append(const QByteArray &ba);
-  bool setEof();
+		QByteArray& getBuffer();
+		bool append(const QByteArray &ba);
+		bool setEof();
 
-protected:
-  qint64 readData(char *data, qint64 maxSize);
-  qint64 writeData(const char *data, qint64 maxSize);
+	protected:
+		qint64 readData(char *data, qint64 maxSize);
+		qint64 writeData(const char *data, qint64 maxSize);
 
-private:
-  QByteArray buffer;
-  bool eof;
+	private:
+		QByteArray buffer;
+		bool eof;
 };
 
 #endif  /* QFCGI_STREAM_H */

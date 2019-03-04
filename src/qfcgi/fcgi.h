@@ -19,6 +19,7 @@
 #define QFCGI_FCGI_H
 
 #include <QObject>
+#include <QLocalServer>
 
 class QFCgiConnection;
 class QFCgiConnectionBuilder;
@@ -78,7 +79,7 @@ public:
    *
    * @param path The path to the UNIX domain socket
    */
-  void configureListen(const QString &path);
+  void configureListen(const QString &path, QLocalServer::SocketOptions opts = QLocalServer::NoOptions);
 
   /**
    * Configures the FastCGI application server for listening on the given

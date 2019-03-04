@@ -26,35 +26,36 @@ class QFCgiRecord;
 class QFCgiRequest;
 class QIODevice;
 
-class QFCgiConnection : public QObject {
-  Q_OBJECT
+class QFCgiConnection : public QObject
+{
+	Q_OBJECT
 
-public:
-  QFCgiConnection(QIODevice *device, QFCgi *parent);
-  virtual ~QFCgiConnection();
+	public:
+		QFCgiConnection(QIODevice *device, QFCgi *parent);
+		virtual ~QFCgiConnection();
 
-  int getId() const;
+		int getId() const;
 
-  void send(const QFCgiRecord &record);
-  void closeConnection();
+		void send(const QFCgiRecord &record);
+		void closeConnection();
 
-private slots:
-  void onReadyRead();
-  void onDisconnected();
+	private slots:
+		void onReadyRead();
+		void onDisconnected();
 
-private:
-  void fillBuffer();
-  void handleManagementRecord(QFCgiRecord &record);
-  void handleApplicationRecord(QFCgiRecord &record);
-  void handleFCGI_BEGIN_REQUEST(QFCgiRecord &record);
-  void handleFCGI_PARAMS(QFCgiRequest *request, QFCgiRecord &record);
-  void handleFCGI_STDIN(QFCgiRequest *request, QFCgiRecord &record);
-  bool validateRole(quint16 role) const;
+	private:
+		void fillBuffer();
+		void handleManagementRecord(QFCgiRecord &record);
+		void handleApplicationRecord(QFCgiRecord &record);
+		void handleFCGI_BEGIN_REQUEST(QFCgiRecord &record);
+		void handleFCGI_PARAMS(QFCgiRequest *request, QFCgiRecord &record);
+		void handleFCGI_STDIN(QFCgiRequest *request, QFCgiRecord &record);
+		bool validateRole(quint16 role) const;
 
-  int id;
-  QIODevice *device;
-  QByteArray buf;
-  QHash<int, QFCgiRequest*> requests;
+		int id;
+		QIODevice *device;
+		QByteArray buf;
+		QHash<int, QFCgiRequest*> requests;
 };
 
 #endif  /* QFCGI_CONNECTION_H */

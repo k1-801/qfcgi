@@ -47,6 +47,8 @@ add_library(qfcgi
   src/qfcgi/fcgi.h
   src/qfcgi/fdbuilder.cpp
   src/qfcgi/fdbuilder.h
+  src/qfcgi/file.cpp
+  src/qfcgi/file.h
   src/qfcgi/localbuilder.cpp
   src/qfcgi/localbuilder.h
   src/qfcgi/record.cpp

@@ -78,13 +78,17 @@ qint64 QFCgiStream::readData(char *data, qint64 maxSize) {
   }
 }
 
-qint64 QFCgiStream::writeData(const char *data, qint64 maxSize) {
-  if (is_writable()) {
-    this->buffer.append(data, maxSize);
-    emit bytesWritten(maxSize);
+qint64 QFCgiStream::writeData(const char *data, qint64 maxSize)
+{
+	if (is_writable())
+	{
+		this->buffer.append(data, maxSize);
+		emit bytesWritten(maxSize);
 
-    return maxSize;
-  } else {
-    return -1;
-  }
+		return maxSize;
+	}
+	else
+	{
+		return -1;
+	}
 }

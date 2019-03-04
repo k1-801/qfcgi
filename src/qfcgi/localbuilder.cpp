@@ -22,10 +22,11 @@
 #include "fcgi.h"
 #include "localbuilder.h"
 
-QFCgiLocalConnectionBuilder::QFCgiLocalConnectionBuilder(const QString &path, QObject *parent)
+QFCgiLocalConnectionBuilder::QFCgiLocalConnectionBuilder(const QString &path, QLocalServer::SocketOptions opts, QObject *parent)
   : QFCgiConnectionBuilder(parent) {
 
   this->server = new QLocalServer(this);
+  this->server->setSocketOptions(opts);
   this->path = path;
 }
 

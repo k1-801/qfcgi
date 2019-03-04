@@ -22,23 +22,24 @@
 
 class QSocketNotifier;
 
-class QFCgiFdConnectionBuilder : public QFCgiConnectionBuilder {
-  Q_OBJECT
+class QFCgiFdConnectionBuilder : public QFCgiConnectionBuilder
+{
+	Q_OBJECT
 
-public:
-  QFCgiFdConnectionBuilder(int fd,QObject *parent = 0);
-  virtual ~QFCgiFdConnectionBuilder();
+	public:
+		QFCgiFdConnectionBuilder(int fd,QObject *parent = nullptr);
+		virtual ~QFCgiFdConnectionBuilder();
 
-  bool listen();
-  bool isListening() const;
-  QString errorString() const;
+		bool listen();
+		bool isListening() const;
+		QString errorString() const;
 
-private slots:
-  void onActivated(int socket);
+	private slots:
+		void onActivated(int socket);
 
-private:
-  QSocketNotifier *notifier;
-  int fd;
+	private:
+		QSocketNotifier *notifier;
+		int fd;
 };
 
 #endif  /* QFCGI_FD_BUILDER_H */

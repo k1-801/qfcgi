@@ -61,8 +61,9 @@ void QFCgiConnection::send(const QFCgiRecord &record) {
   record.write(this->device);
 }
 
-void QFCgiConnection::closeConnection() {
-  this->device->close();
+void QFCgiConnection::closeConnection()
+{
+	this->device->close();
 }
 
 void QFCgiConnection::onReadyRead() {
@@ -166,7 +167,7 @@ void QFCgiConnection::handleFCGI_PARAMS(QFCgiRequest *request, QFCgiRecord &reco
   const QByteArray &ba = record.getContent();
 
   if (!ba.isEmpty()) {
-    q2Debug(record, "FCGI_PARAMS");
+	q2Debug(record, "FCGI_PARAMS");
     request->consumeParamsBuffer(ba);
   } else {
     q2Debug(record, "FCGI_PARAMS (end of stream)");
